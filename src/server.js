@@ -1,12 +1,20 @@
+const app = require("./app");
 const db = require("./db/connection");
 
-async function testDB() {
+const PORT = 3000;
+
+async function startServer() {
   try {
-    const [rows] = await db.query("SELECT 1");
+    await db.query("SELECT 1");
     console.log("Database connected");
+
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+
   } catch (err) {
-    console.error("DB connection failed:", err);
+    console.error("Failed to start server:", err);
   }
 }
 
-testDB();
+startServer();
