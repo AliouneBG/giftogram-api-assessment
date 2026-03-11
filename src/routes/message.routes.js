@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const { sendMessage } = require("../controllers/message.controller");
+const { sendMessage, viewMessages } = require("../controllers/message.controller");
 
 router.post("/", sendMessage);
+router.get("/view_messages",viewMessages)
 
 module.exports = router;
