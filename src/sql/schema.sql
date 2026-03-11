@@ -1,3 +1,5 @@
+CREATE DATABASE IF NOT EXISTS giftogram_chat;
+USE giftogram_chat;
 CREATE TABLE users(
     id INT PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(255) NOT NULL UNIQUE,
