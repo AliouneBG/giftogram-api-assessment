@@ -1,56 +1,61 @@
-const db=require('../db/connection')
-async function sendMessage(req,res){
-    try{
-        const {sender_id,receiver_id,message_body}=req.body;
-        if(sender_id==null||receiver_id==null||message_body==null){
-            return res.status(400).json({
-                error_code:100,
-                error_title:"Validation Error",
-                error_message:"sender_id, receiver_id, and message_body are required"
-            });
-        }
-         const [sender] = await db.query(
-            "SELECT id FROM users WHERE id = ?",
-            [sender_id]
-        );
+const db = require("../db/connection");
 
-        if(sender.length === 0){
-            return res.status(404).json({
-                error_code:101,
-                error_title:"Sender Not Found",
-                error_message:"Sender does not exist"
-            });
-        }
+async function sendMessage(req, res) {
+  try {
+    const { sender_id, receiver_id, message_body } = req.body;
+    const message = message_body?.trim();
 
-        const [receiver] = await db.query(
-            "SELECT id FROM users WHERE id = ?",
-            [receiver_id]
-        );
+    if (sender_id == null || receiver_id == null || !message) {
+      return res.status(400).json({
+        error_code: 100,
+        error_title: "Validation Error",
+        error_message: "sender_id, receiver_id, and message_body are required"
+      });
+    }
 
-        if(receiver.length === 0){
-            return res.status(404).json({
-                error_code:102,
-                error_title:"Receiver Not Found",
-                error_message:"Receiver does not exist"
-            });
-        }
-        const [result] = await db.query(
+    const [sender] = await db.query(
+      "SELECT id FROM users WHERE id = ?",
+      [sender_id]
+    );
+
+    if (sender.length === 0) {
+      return res.status(404).json({
+        error_code: 101,
+        error_title: "Sender Not Found",
+        error_message: "Sender does not exist"
+      });
+    }
+
+    const [receiver] = await db.query(
+      "SELECT id FROM users WHERE id = ?",
+      [receiver_id]
+    );
+
+    if (receiver.length === 0) {
+      return res.status(404).json({
+        error_code: 102,
+        error_title: "Receiver Not Found",
+        error_message: "Receiver does not exist"
+      });
+    }
+
+    const [result] = await db.query(
       "INSERT INTO messages (sender_id, receiver_id, message_body) VALUES (?, ?, ?)",
-      [sender_id, receiver_id, message_body]
+      [sender_id, receiver_id, message]
     );
 
     return res.status(201).json({
       message: "Message sent successfully",
       message_id: result.insertId
     });
-
   } catch (error) {
     console.error("Send message error:", error);
     return res.status(500).json({
-      error: "Internal server error"
+      error_code: 500,
+      error_title: "Server Error",
+      error_message: "Internal server error"
     });
   }
-
 }
 
 async function viewMessages(req, res) {
@@ -93,4 +98,4 @@ async function viewMessages(req, res) {
   }
 }
 
-module.exports={sendMessage,viewMessages}
+module.exports = { sendMessage, viewMessages };

@@ -1,11 +1,20 @@
 const db = require("../db/connection");
 const bcrypt = require("bcrypt");
 
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 async function registerUser(req, res) {
   try {
     const { email, first_name, last_name, password } = req.body;
 
-    if (!email || !first_name || !last_name || !password) {
+    const emailValue = email?.trim();
+    const firstNameValue = first_name?.trim();
+    const lastNameValue = last_name?.trim();
+    const passwordValue = password?.trim();
+
+    if (!emailValue || !firstNameValue || !lastNameValue || !passwordValue) {
       return res.status(400).json({
         error_code: 100,
         error_title: "Validation Error",
@@ -13,9 +22,17 @@ async function registerUser(req, res) {
       });
     }
 
+    if (!isValidEmail(emailValue)) {
+      return res.status(400).json({
+        error_code: 100,
+        error_title: "Validation Error",
+        error_message: "Invalid email format"
+      });
+    }
+
     const [existingUsers] = await db.query(
       "SELECT id FROM users WHERE email = ?",
-      [email]
+      [emailValue]
     );
 
     if (existingUsers.length > 0) {
@@ -26,11 +43,11 @@ async function registerUser(req, res) {
       });
     }
 
-    const password_hash = await bcrypt.hash(password, 10);
+    const password_hash = await bcrypt.hash(passwordValue, 10);
 
     const [result] = await db.query(
       "INSERT INTO users (email, first_name, last_name, password_hash) VALUES (?, ?, ?, ?)",
-      [email, first_name, last_name, password_hash]
+      [emailValue, firstNameValue, lastNameValue, password_hash]
     );
 
     return res.status(201).json({
@@ -51,7 +68,10 @@ async function loginUser(req, res) {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
+    const emailValue = email?.trim();
+    const passwordValue = password?.trim();
+
+    if (!emailValue || !passwordValue) {
       return res.status(400).json({
         error_code: 100,
         error_title: "Validation Error",
@@ -59,9 +79,17 @@ async function loginUser(req, res) {
       });
     }
 
+    if (!isValidEmail(emailValue)) {
+      return res.status(400).json({
+        error_code: 100,
+        error_title: "Validation Error",
+        error_message: "Invalid email format"
+      });
+    }
+
     const [users] = await db.query(
       "SELECT id, email, first_name, last_name, password_hash FROM users WHERE email = ?",
-      [email]
+      [emailValue]
     );
 
     if (users.length === 0) {
@@ -74,7 +102,7 @@ async function loginUser(req, res) {
 
     const user = users[0];
 
-    const isPasswordMatch = await bcrypt.compare(password, user.password_hash);
+    const isPasswordMatch = await bcrypt.compare(passwordValue, user.password_hash);
 
     if (!isPasswordMatch) {
       return res.status(401).json({

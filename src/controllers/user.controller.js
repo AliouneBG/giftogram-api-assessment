@@ -2,19 +2,19 @@ const db = require("../db/connection");
 
 async function listUsers(req, res) {
   try {
-    const { user_id } = req.query;
+    const { requester_user_id } = req.query;
 
-    if (user_id == null) {
+    if (requester_user_id == null) {
       return res.status(400).json({
         error_code: 100,
         error_title: "Validation Error",
-        error_message: "user_id is required"
+        error_message: "requester_user_id is required"
       });
     }
 
     const [users] = await db.query(
-      "SELECT id, email, first_name, last_name, created_at FROM users WHERE id != ?",
-      [user_id]
+      "SELECT id, email, first_name, last_name FROM users WHERE id != ?",
+      [requester_user_id]
     );
 
     return res.status(200).json({
