@@ -77,6 +77,15 @@ Validation:
 - Email must have a valid format
 
 If validation succeeds, the password is hashed and the user is inserted into the database.
+**Example API Request**
+```json
+{
+  "email": "user@example.com",
+  "first_name": "User1",
+  "last_name": "Test",
+  "password": "password123"
+}
+```
 
 ---
 
@@ -91,6 +100,13 @@ Steps:
 3. Check if the user exists
 4. Compare the provided password with the stored password hash
 5. Return a successful response if authentication succeeds
+   **Example API Request**
+```json
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
 
 ---
 
@@ -100,7 +116,8 @@ Steps:
 Returns a list of users **excluding the requesting user**.
 
 The endpoint expects the requesting user's id as a request parameter. This ensures that the user does not appear in their own list of available users.
-
+**Example**
+/list_all_users?requester_user_id=1
 ---
 
 ## Send Message
@@ -115,6 +132,14 @@ Validation steps include:
 - Checking that the message body is not empty
 
 Once validated, the message is inserted into the `messages` table.
+**Example**
+```json
+{
+  "sender_user_id": 1,
+  "receiver_user_id": 2,
+  "message": "Hello!"
+}
+```
 
 ---
 
@@ -134,6 +159,8 @@ Results are returned chronologically and include:
 - sender id
 - message content
 - timestamp (returned as epoch)
+  **Example**
+  /view_messages?user_id_a=1&user_id_b=2
 
 ---
 
