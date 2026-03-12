@@ -50,9 +50,11 @@ async function registerUser(req, res) {
       [emailValue, firstNameValue, lastNameValue, password_hash]
     );
 
-    return res.status(201).json({
-      message: "User registered successfully",
-      userId: result.insertId
+    return res.status(200).json({
+      user_id: result.insertId,
+      email: emailValue,
+      first_name: firstNameValue,
+      last_name: lastNameValue
     });
   } catch (error) {
     console.error("Register error:", error);
@@ -101,7 +103,6 @@ async function loginUser(req, res) {
     }
 
     const user = users[0];
-
     const isPasswordMatch = await bcrypt.compare(passwordValue, user.password_hash);
 
     if (!isPasswordMatch) {
@@ -113,13 +114,10 @@ async function loginUser(req, res) {
     }
 
     return res.status(200).json({
-      message: "Login successful",
-      user: {
-        id: user.id,
-        email: user.email,
-        first_name: user.first_name,
-        last_name: user.last_name
-      }
+      user_id: user.id,
+      email: user.email,
+      first_name: user.first_name,
+      last_name: user.last_name
     });
   } catch (error) {
     console.error("Login error:", error);

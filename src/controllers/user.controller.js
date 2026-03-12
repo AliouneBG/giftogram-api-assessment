@@ -13,7 +13,7 @@ async function listUsers(req, res) {
     }
 
     const [users] = await db.query(
-      "SELECT id, email, first_name, last_name FROM users WHERE id != ?",
+      "SELECT id AS user_id, email, first_name, last_name FROM users WHERE id != ?",
       [requester_user_id]
     );
 
